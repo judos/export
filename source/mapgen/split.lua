@@ -5,22 +5,30 @@ require "libs.lua.functionBindings"
 -- on_chunk_generated
 -- on_player_created
 
-
 local split={}
 
 local spawn_size = 64
 local ressSize = 8
+
+function generate_water_in_chunk(x,y,surface) -- coords are left_top of chunk
+	local tiles = square({{-2,-5},{2,5}},translate(x+16,y+16,generate_water_tile))
+	surface.set_tiles(tiles, true)
+end
+
 local startingResource = {
 	["-2,-2"]={"iron-ore",8,200},
 	["-2,-1"]={"copper-ore",7,200},
 	["-1,-2"]={"stone",8,200},
 	["-1,-1"]={"coal",8,400},
+	["-1,1"]= generate_water_in_chunk,
 	
 	["1,-2"]={"iron-ore",8,200},
 	["1,-1"]={"copper-ore",7,200},
 	["0,-2"]={"stone",8,200},
-	["0,-1"]={"coal",8,400}
+	["0,-1"]={"coal",8,400},
+	["0,1"]=generate_water_in_chunk
 }
+
 
 
 function generate_border_tile(x,y,tiles)
@@ -39,6 +47,10 @@ end
 
 function generate_resource(x,y,name,amount)
 	return {name=name,position={x,y},amount=amount}
+end
+
+function generate_water_tile(x,y)
+	return {name="water",position={x,y}}
 end
 	
 
@@ -99,8 +111,9 @@ function split.on_chunk_generated(event)
 			math.floor(event.area.left_top.y/32)}
 		local chunkStr = chunkCoords[1]..","..chunkCoords[2]
 		local resGen = startingResource[chunkStr]
-		if resGen ~=nil then
-					
+		if resGen ~= nil and type(resGen)=="function" then
+			resGen(event.area.left_top.x, event.area.left_top.y,game.surfaces[1])
+		elseif resGen ~= nil then
 			local sur = game.surfaces[1]
 			local fs = resGen[2] -- field Size
 			local entities = square({{-fs,-fs},{fs,fs}},
@@ -116,7 +129,7 @@ function split.on_chunk_generated(event)
 		return
 	end
 	
-	--x(event.area)
+	-- xx(event.area)
 	
 	local tiles = {}
 	for x = event.area.left_top.x, event.area.right_bottom.x do
@@ -137,5 +150,8 @@ function split.on_player_created(event)
 		game.players[nr].teleport( game.players[nr].force.get_spawn_position(game.surfaces[1]))
 	end
 end
+
+
+
 
 return split
