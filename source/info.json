@@ -1,0 +1,10 @@
+{
+	"name": "export",
+	"version": "0.1.0",
+	"title": "Export",
+	"author": "judos",
+	"description": "Separate map regions for players, export items to others for profit",
+	"dependencies": ["base >= 0.16.0"],
+	"homepage": "",
+	"factorio_version": "0.16"
+}
