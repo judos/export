@@ -1,21 +1,8 @@
 TODO:
 
-chem plant:
-	solid fuel (solid-fuel-from-xxx-xxx)
-	sulfur  (sulfur)
-	plastic (plastic-bar)
-centrifuge:
-	uranium processing?
-	nuclear-fuel-reprocessing?
-	kovarix-enrichment-process?
-
-export_furnaces
-
 localization
 
 export chests
 
 
-Known Bugs:
-	icon nuclear fuel bugged in technology screen
-	-> prototype is correct, factorio bug?
+export recipe in wrong crafting category

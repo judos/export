@@ -6,10 +6,11 @@ TODO 4.0:
 3.8 export
 	add function argument bindings
 	add lua/indices, lua/numbers
-	remove deepcopy function (lua has native table.deepcopy)
+	moved deepcopy function (various to table)
 	added recipe functions
+	add prototype.icons
 	MIGRATION:
-		use table.deepcopy instead of custom deepcopy
+		fix imports for deepcopy
 	
 
 3.7 hardCrafting

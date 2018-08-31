@@ -1,4 +1,6 @@
 require("libs.lua.string")
+require("libs.lua.table")
+require("libs.prototypes.icons")
 
 data:extend(
 {
@@ -43,34 +45,22 @@ function l(text)
 end
 
 function create_item(name,itemTable)
-	ll = name =="stone-brick"
+	ll = false --name =="nuclear-fuel"
 	
-	local icon_size = itemTable.icon_size
-	if icon_size and (icon_size ~= 32 and icon_size ~= 64 and icon_size ~= 128) then
-		error("ERROR: icon_size that is not 32, 64 or 128: "..name)
-	end
-	if not icon_size then icon_size = 32 end
-	
-	local icons
+	local icon_size = itemTable.icon_size or 32
 	local sticker = {
 		icon = "__export__/graphics/sticker-"..icon_size..".png",
-		icon_size = icon_size,
+		icon_size = icon_size
 	}
-	if itemTable.icon then
-		icons = { {icon=itemTable.icon}, sticker }
-	elseif itemTable.icons then
-		icons = table.deepcopy(itemTable.icons)
-		table.insert(icons, sticker)
-	else
-		error("ERROR: item with no icon or icons properties ("..name..")")
-	end
-	l(icons)
+	local itemCopy = deepcopy(itemTable)
+	iconAddLast(itemCopy, sticker)
+	
 	data:extend({
 		{
 			type = "item",
 			name = "export_"..name,
-			icons = icons,
-			icon_size = icon_size,
+			icons = itemCopy.icons,
+			icon_size = itemCopy.icon_size,
 			flags = itemTable.flags,
 			subgroup = "export_items",
 			order = itemTable.order,
