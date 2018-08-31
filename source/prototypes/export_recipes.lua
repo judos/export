@@ -78,10 +78,12 @@ for name,recipe in pairs(data.raw.recipe) do
 			local recipeNew = deepcopy(recipe)
 			recipeNew.name = "export_"..recipe.name
 			
+			if recipeNew.subgroup then
+				recipeNew.subgroup = "export_items"
+			end
 			if recipeNew.icon or recipeNew.icons then
 				updateRecipeIcon(recipeNew)
 			end
-			
 			if recipeNew.category == "smelting" then
 				recipeNew.category = "export_smelting"
 			end

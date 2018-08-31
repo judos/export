@@ -1,8 +1,8 @@
 TODO:
 
-localization
-
 export chests
 
 
-export recipe in wrong crafting category
+Optional:
+	localization
+	make some order in export crafting group
