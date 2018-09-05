@@ -155,14 +155,14 @@ function chunk_generator_split_base_borders(event)
 		local tiles = square({{-r, -16}, {r, 15}},
 			translate(event.area.left_top.x + 16, event.area.left_top.y + 16, 
 			generate_border_tile))
-		event.surface.set_tiles(entities, true)
+		event.surface.set_tiles(tiles, true)
 	end
-	if chunksPos.y == 0 then
+	if chunkPos.y == 0 then
 		local r = split_border_radius
 		local tiles = square({{-16, -r}, {15, r}},
 			translate(event.area.left_top.x + 16, event.area.left_top.y + 16, 
 			generate_border_tile))
-		event.surface.set_tiles(entities, true)
+		event.surface.set_tiles(tiles, true)
 	end
 end
 
@@ -181,32 +181,38 @@ function split.on_chunk_generated(event)
   -- only check nauvis 
 	if event.surface ~= game.surfaces[1] then return end
 
-	
-	
-	local tiles = {}
-	for x = event.area.left_top.x, event.area.right_bottom.x do
-		for y = event.area.left_top.y, event.area.right_bottom.y do
-			generate_border_tile(x,y,tiles)
-		end
+	for _,generator in pairs(chunk_generators) do
+		generator(event)
 	end
-	event.surface.set_tiles(tiles, true)
 
 end
 
 
 function split.on_init()
+	game.create_force("player1")
 	game.create_force("player2")
-	game.forces['player'].set_spawn_position({-15,0},game.surfaces[1])
-	game.forces['player2'].set_spawn_position({15,0},game.surfaces[1])	
+	game.create_force("player3")
+	game.create_force("player4")
+	game.forces['player1'].set_spawn_position({48, 48},game.surfaces[1])
+	game.forces['player2'].set_spawn_position({-16, 48},game.surfaces[1])
+	game.forces['player3'].set_spawn_position({-16, -16},game.surfaces[1])
+	game.forces['player4'].set_spawn_position({48, -16},game.surfaces[1])
+	for i=1,4 do
+		for j=1,4 do
+			if i ~= j then
+				game.forces['player'..i].set_cease_fire('player'..j, true)
+			end
+		end
+	end
+
 end
 
 function split.on_player_created(event)
 	local nr = event.player_index
-	local force = nr % 2
-	if force == 0 then
-		game.players[nr].force = 'player2'
-		game.players[nr].teleport( game.players[nr].force.get_spawn_position(game.surfaces[1]))
-	end
+	local force = nr % 4 + 1
+
+	game.players[nr].force = 'player'..force
+	game.players[nr].teleport( game.players[nr].force.get_spawn_position(game.surfaces[1]))
 end
 
 
