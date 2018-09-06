@@ -187,13 +187,15 @@ function chunk_generator_warehouses(event)
 	if chunkPos.x == 0 and chunkPos.y == 0 then return end
 	if math.abs(chunkPos.x) > amount_warehouses or math.abs(chunkPos.y) > amount_warehouses then return end
 
-	local coords, forces
+	local coords, forces, combinatorOffset
 	if chunkPos.x == 0 then
 		coords = { {left_top.x + 8, left_top.y + 16}, {left_top.x + 25, left_top.y + 16} }
 		forces = { chunkPos.y>0 and 2 or 3, chunkPos.y > 0 and 1 or 4 }
+		combinatorOffset = { 0, 3 }
 	elseif chunkPos.y == 0 then
 		coords = { {left_top.x + 16, left_top.y + 8}, {left_top.x + 16, left_top.y + 25} }
 		forces = { chunkPos.x>0 and 4 or 3, chunkPos.x > 0 and 1 or 2 }
+		combinatorOffset = { 3, 0 }
 	end
 	for i=1,2 do
 		local entity = event.surface.create_entity{
@@ -203,6 +205,14 @@ function chunk_generator_warehouses(event)
 		}
 		entity.destructible = false
 		entity.minable = false
+		
+		local combinator = event.surface.create_entity{
+			name = "import-combinator",
+			position = { coords[i][1] + combinatorOffset[1], coords[i][2] + combinatorOffset[2] },
+			force = "player" .. forces[i]
+		}
+		combinator.destructible = false
+		combinator.minable = false
 
 	end
 end
@@ -244,8 +254,7 @@ function split.on_init()
 		for j=1,4 do
 			if i ~= j then
 				game.forces['player'..i].set_friend('player'..j, true)
-				
-			end
+ 			end
 		end
 	end
 
