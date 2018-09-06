@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"title": "Export",
 	"author": "judos",
-	"description": "Separate map regions for players, export items to others for profit",
+	"description": "split base coop map - 4 forces export items to each other for the win",
 	"dependencies": ["base >= 0.16.0", "Warehousing >= 0.1.3"],
 	"homepage": "",
 	"factorio_version": "0.16"
