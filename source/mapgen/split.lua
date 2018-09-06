@@ -8,6 +8,7 @@ require "libs.lua.functionBindings"
 local split={}
 
 local spawn_size = 3 -- radius amount of chunks starting area per force (3 minimum for resources config below)
+local amount_warehouses = 6 -- amount of warehouses placed at the border
 local split_border_radius = 5 -- black border where forces can't cross
 
 local startingResource = {
@@ -167,12 +168,41 @@ function chunk_generator_split_base_borders(event)
 end
 
 
+function chunk_generator_warehouses(event)
+	local left_top = event.area.left_top
+	local chunkPos = pos_to_chunkPos(left_top)
+	if chunkPos.x ~= 0 and chunkPos.y ~= 0 then return end
+	if chunkPos.x == 0 and chunkPos.y == 0 then return end
+	if math.abs(chunkPos.x) > amount_warehouses or math.abs(chunkPos.y) > amount_warehouses then return end
+
+	local coords, forces
+	if chunkPos.x == 0 then
+		coords = { {left_top.x + 8, left_top.y + 16}, {left_top.x + 24, left_top.y + 16} }
+		forces = { chunkPos.y>0 and 2 or 3, chunkPos.y > 0 and 1 or 4 }
+	elseif chunkPos.y == 0 then
+		coords = { {left_top.x + 16, left_top.y + 8}, {left_top.x + 16, left_top.y + 24} }
+		forces = { chunkPos.x>0 and 4 or 3, chunkPos.x > 0 and 1 or 2 }
+	end
+	for i=1,2 do
+		local entity = event.surface.create_entity{
+			name = "warehouse-basic", 
+			position = coords[i], 
+			force = "player" .. forces[i]
+		}
+		entity.destructible = false
+		entity.minable = false
+
+	end
+end
+
+
 -- all the different modifications on top of the vanilla map generation in order:
 local chunk_generators = {
 	chunk_generator_spawn_tiles,
 	chunk_generator_spawn_clean_area,
 	chunk_generator_spawn_starting_resource,
-	chunk_generator_split_base_borders
+	chunk_generator_split_base_borders,
+	chunk_generator_warehouses
 }
 
 
@@ -209,7 +239,7 @@ end
 
 function split.on_player_created(event)
 	local nr = event.player_index
-	local force = nr % 4 + 1
+	local force = (nr-1) % 4 + 1
 
 	game.players[nr].force = 'player'..force
 	game.players[nr].teleport( game.players[nr].force.get_spawn_position(game.surfaces[1]))
