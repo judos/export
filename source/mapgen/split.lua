@@ -75,6 +75,12 @@ function foreach(tabl, lambda)
 	end
 end
 
+function filter(filter, lambda)
+	return function(x,y)
+		if filter(x,y) then return lambda(x,y) end
+	end
+end
+
 
 -- Tile creators
 
@@ -151,19 +157,25 @@ end
 function chunk_generator_split_base_borders(event)
 	local chunkPos = pos_to_chunkPos(event.area.left_top)
 	if chunkPos.x ~= 0 and chunkPos.y ~= 0 then return end
+	local r = split_border_radius
 	if chunkPos.x == 0 then
-		local r = split_border_radius
 		local tiles = square({{-r, -16}, {r, 15}},
 			translate(event.area.left_top.x + 16, event.area.left_top.y + 16, 
 			generate_border_tile))
 		event.surface.set_tiles(tiles, true)
 	end
 	if chunkPos.y == 0 then
-		local r = split_border_radius
 		local tiles = square({{-16, -r}, {15, r}},
 			translate(event.area.left_top.x + 16, event.area.left_top.y + 16, 
 			generate_border_tile))
 		event.surface.set_tiles(tiles, true)
+	end
+	if chunkPos.x == 0 and chunkPos.y == 0 then
+		local tiles = square({{-r, -r}, {r, r}},
+			translate(16,16,
+			filter(function(x,y) return (x-16+y-16 == 0) or (x-16-y+16 == 0) end,
+			generate_spawn_tile)))
+		 event.surface.set_tiles(tiles, true)
 	end
 end
 
@@ -223,10 +235,11 @@ function split.on_init()
 	game.create_force("player2")
 	game.create_force("player3")
 	game.create_force("player4")
-	game.forces['player1'].set_spawn_position({48, 48},game.surfaces[1])
-	game.forces['player2'].set_spawn_position({-16, 48},game.surfaces[1])
-	game.forces['player3'].set_spawn_position({-16, -16},game.surfaces[1])
-	game.forces['player4'].set_spawn_position({48, -16},game.surfaces[1])
+	local d = 5
+	game.forces['player1'].set_spawn_position({32+d, 32+d},game.surfaces[1])
+	game.forces['player2'].set_spawn_position({-d, 32+d},game.surfaces[1])
+	game.forces['player3'].set_spawn_position({-d, -d},game.surfaces[1])
+	game.forces['player4'].set_spawn_position({32+d, -d},game.surfaces[1])
 	for i=1,4 do
 		for j=1,4 do
 			if i ~= j then
