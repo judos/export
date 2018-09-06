@@ -1,8 +1,9 @@
 TODO:
 
-export chests
-
+- actually export items in warehouses
 
 Optional:
 	localization
 	make some order in export crafting group
+	gui to let players switch force? or just command?
+	remove trees when placing warehouses

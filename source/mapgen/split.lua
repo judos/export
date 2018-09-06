@@ -11,7 +11,7 @@ local spawn_size = 3 -- radius amount of chunks starting area per force (3 minim
 local amount_warehouses = 6 -- amount of warehouses placed at the border
 local split_border_radius = 5 -- black border where forces can't cross
 
-local startingResource = {
+local startingResource = { -- these are mirrored for all 4 forces
 	["3,3"]={"iron-ore",8,8,200},
 	["3,2"]={"copper-ore",7,7,200},
 	["2,2"]={"stone",8,8,200},
@@ -189,10 +189,10 @@ function chunk_generator_warehouses(event)
 
 	local coords, forces
 	if chunkPos.x == 0 then
-		coords = { {left_top.x + 8, left_top.y + 16}, {left_top.x + 24, left_top.y + 16} }
+		coords = { {left_top.x + 8, left_top.y + 16}, {left_top.x + 25, left_top.y + 16} }
 		forces = { chunkPos.y>0 and 2 or 3, chunkPos.y > 0 and 1 or 4 }
 	elseif chunkPos.y == 0 then
-		coords = { {left_top.x + 16, left_top.y + 8}, {left_top.x + 16, left_top.y + 24} }
+		coords = { {left_top.x + 16, left_top.y + 8}, {left_top.x + 16, left_top.y + 25} }
 		forces = { chunkPos.x>0 and 4 or 3, chunkPos.x > 0 and 1 or 2 }
 	end
 	for i=1,2 do
@@ -235,7 +235,7 @@ function split.on_init()
 	game.create_force("player2")
 	game.create_force("player3")
 	game.create_force("player4")
-	local d = 5
+	local d = -16 + split_border_radius + 2
 	game.forces['player1'].set_spawn_position({32+d, 32+d},game.surfaces[1])
 	game.forces['player2'].set_spawn_position({-d, 32+d},game.surfaces[1])
 	game.forces['player3'].set_spawn_position({-d, -d},game.surfaces[1])
@@ -243,7 +243,8 @@ function split.on_init()
 	for i=1,4 do
 		for j=1,4 do
 			if i ~= j then
-				game.forces['player'..i].set_cease_fire('player'..j, true)
+				game.forces['player'..i].set_friend('player'..j, true)
+				
 			end
 		end
 	end
@@ -258,6 +259,29 @@ function split.on_player_created(event)
 	game.players[nr].teleport( game.players[nr].force.get_spawn_position(game.surfaces[1]))
 end
 
+function force_from_position(position)
+	local dx = position.x - 16
+	local dy = position.y - 16
+	local f
+	if dx > 0 then
+		f = dy > 0 and 1 or 4
+	else
+		f = dy > 0 and 2 or 3
+	end
+	return game.forces['player'..f]
+end
+
+function split.on_built_entity(event)
+	local player = game.players[event.player_index]
+	local force = player.force
+	local entity = event.created_entity
+	local forceArea = force_from_position(entity.position)
+	if force.name ~= forceArea.name then
+		player.print("You tried to build in district "..forceArea.name:sub(7)..", but belong to district "..force.name:sub(7))
+		player.insert(event.stack)
+		entity.destroy()
+	end
+end
 
 
 return split

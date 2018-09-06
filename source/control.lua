@@ -2,6 +2,7 @@ split = require("mapgen/split")
 
 -- global data used:
 -- version = $version
+-- 
 
 -- Init --
 script.on_init(function()
@@ -30,6 +31,11 @@ end)
 
 script.on_event(defines.events.on_player_created, function(event)
 	split.on_player_created(event)
+end)
+
+
+script.on_event(defines.events.on_built_entity, function(event)
+	split.on_built_entity(event)
 end)
 
 
