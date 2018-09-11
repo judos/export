@@ -1,8 +1,21 @@
 split = require("mapgen/split")
+export = require("control/export_items")
 
--- global data used:
--- version = $version
--- 
+--[[
+global data used:
+  {
+    version = $version
+    buildings = {
+      [$force] = {
+        {
+          combinator = (combinator)
+          warehouse = (warehouse)
+        }
+      }
+    }
+  }
+
+]]-- 
 
 -- Init --
 script.on_init(function()
