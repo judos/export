@@ -19,7 +19,7 @@ local startingResource = { -- these are mirrored for all 4 forces
 	["1,3"]={"water",2,5}	
 }
 
---[[ Text representation of the map:
+--[[ Text representation of the map, resources are mirrored:
 
    |
    |

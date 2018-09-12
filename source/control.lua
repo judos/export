@@ -35,6 +35,7 @@ script.on_configuration_changed(function()
 end)
 
 script.on_event(defines.events.on_tick, function(event)
+	export.on_tick(event)
 end)
 
 
