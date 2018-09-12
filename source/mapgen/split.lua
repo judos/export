@@ -198,22 +198,28 @@ function chunk_generator_warehouses(event)
 		combinatorOffset = { 3, 0 }
 	end
 	for i=1,2 do
-		local entity = event.surface.create_entity{
+		local forceName = "player" .. forces[i]
+		if global.buildings[forceName] == nil then global.buildings[forceName] = {} end
+
+		local warehouse = event.surface.create_entity{
 			name = "warehouse-basic", 
 			position = coords[i], 
-			force = "player" .. forces[i]
+			force = forceName
 		}
-		entity.destructible = false
-		entity.minable = false
+		warehouse.destructible = false
+		warehouse.minable = false
 		
 		local combinator = event.surface.create_entity{
 			name = "import-combinator",
 			position = { coords[i][1] + combinatorOffset[1], coords[i][2] + combinatorOffset[2] },
-			force = "player" .. forces[i]
+			force = forceName
 		}
 		combinator.destructible = false
 		combinator.minable = false
-
+		table.insert(global.buildings[forceName],{
+			warehouse = warehouse,
+			combinator = combinator
+		})
 	end
 end
 
@@ -241,6 +247,8 @@ end
 
 
 function split.on_init()
+	global.buildings = {}
+
 	game.create_force("player1")
 	game.create_force("player2")
 	game.create_force("player3")

@@ -26,7 +26,7 @@ script.on_configuration_changed(function()
 	local g = global
 	local previousVersion = g.version
 	if previousVersion==nil then
-		g.tasks = {}
+		
 	end
 	if g.version ~= previousVersion then
 		info("Previous global data version: "..previousVersion)
