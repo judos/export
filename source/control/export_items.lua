@@ -19,6 +19,27 @@ function read_inventories_force(i)
 		local warehouse = table.warehouse
 		local content = warehouse.get_inventory(defines.inventory.chest).get_contents()
 
+		-- combine warehouse + requested items
+		local contentRequested = {} -- TODO
+		for item, amount in pairs(contentRequested) do
+			if content[item] ~= nil then
+				content[item] = content[item] - amount
+			else 
+				content[item] = -amount
+			end
+			if content[item] == 0 then content[item] = nil end
+		end
+		-- put need/supply into global table
+		for item, amount in pairs(content) do
+			local t
+			if amount > 0 then
+				t = global.supply
+			else
+				t = global.need
+			end
+			if t[item] == nil then t[item] = {} end
+		end
+
 	end
 end
 
