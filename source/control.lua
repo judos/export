@@ -3,17 +3,25 @@ export = require("control/export_items")
 
 --[[
 global data used:
-  {
-    version = $version
-    buildings = {
-      [$force] = {
-        {
-          combinator = (combinator)
-          warehouse = (warehouse)
-        }
-      }
-    }
-  }
+	{
+		version = $version
+		buildings[$force] = {
+			{
+				combinator = (combinator)
+				warehouse = (warehouse)
+			}
+		}
+		need/supply[$itemName] = {
+			each = {
+				{
+					force = $forceName,
+					warehouse = $warehouse,
+					amount = $amount
+				}
+			},
+			total = $amount
+		}
+	}
 
 ]]-- 
 
