@@ -1,5 +1,5 @@
-split = require("mapgen/split")
-export = require("control/export_items")
+local split = require("mapgen/split")
+local export = require("control/export_items")
 
 --[[
 global data used:

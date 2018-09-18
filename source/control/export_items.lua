@@ -1,10 +1,10 @@
+require "libs.lua.string"
+
 local export = {}
 
 -- a bit of work is done every tick, 
 -- the tick amount to repeat the whole export process must be greater than the individual steps done
-local export_repeat_every_x_ticks = 60
-
-local x = 999999
+local export_repeat_every_x_ticks = 480
 
 
 function clear_data()
@@ -14,13 +14,14 @@ end
 
 function read_inventories_force(i)
 	local forceName = "player"..i
-	for _,table in pairs(global.buildings[forceName]) do
-		local combinator = table.combinator
-		local warehouse = table.warehouse
+	for _,forceBuildings in pairs(global.buildings[forceName]) do
+		local combinator = forceBuildings.combinator
+		local warehouse = forceBuildings.warehouse
 		local content = warehouse.get_inventory(defines.inventory.chest).get_contents()
 
 		-- combine warehouse + requested items
 		local contentRequested = {} -- TODO
+
 		for item, amount in pairs(contentRequested) do
 			if content[item] ~= nil then
 				content[item] = content[item] - amount
@@ -30,25 +31,38 @@ function read_inventories_force(i)
 			if content[item] == 0 then content[item] = nil end
 		end
 		-- put need/supply into global table
-		for item, amount in pairs(content) do
-			local t
-			if amount > 0 then
+		for itemName, amount in pairs(content) do
+			local t = nil
+			-- only put export items into supply table, normal only into need
+			if string.startsWith(itemName,"export_") and amount > 0 then
 				t = global.supply
-			else
+				itemName = string.sub(itemName,8)
+			elseif not string.startsWith(itemName,"export_") and amount < 0 then
 				t = global.need
+				amount = amount * -1
 			end
-			if t[item] == nil then t[item] = {} end
+			if t ~= nil then
+				if t[itemName] == nil then 
+					t[itemName] = { 
+						each = {},
+						total = 0
+					}
+				end
+				table.insert(t[itemName].each, {
+					force = forceName,
+					warehouse = warehouse,
+					amount = amount
+				})
+				t[itemName].total = t[itemName].total + amount
+			end
 		end
-
 	end
 end
 
-function calculate_totals()
-
-end
 
 function distribute_items()
-	
+	game.print("need: " .. serpent.block(global.need))
+	game.print("supply: " .. serpent.block(global.supply))
 end
 
 
@@ -61,8 +75,6 @@ function export.on_tick(event)
 	elseif t >= 1 and t <= 4 then
 		read_inventories_force(t)
 	elseif t == 5 then
-		calculate_totals()
-	elseif t == 6 then
 		distribute_items()
 	end
 	--[[
