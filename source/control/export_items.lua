@@ -20,15 +20,20 @@ function read_inventories_force(i)
 		local content = warehouse.get_inventory(defines.inventory.chest).get_contents()
 
 		-- combine warehouse + requested items
-		local contentRequested = {} -- TODO
+		local contentRequested = combinator.get_merged_signals()
+		if contentRequested == nil then contentRequested = {} end
 
-		for item, amount in pairs(contentRequested) do
-			if content[item] ~= nil then
-				content[item] = content[item] - amount
-			else 
-				content[item] = -amount
+		for _, itemTable in pairs(contentRequested) do
+			if itemTable.signal.type == "item" then
+				local itemName = itemTable.signal.name
+				local amount = itemTable.count
+				if content[itemName] ~= nil then
+					content[itemName] = content[itemName] - amount
+				else 
+					content[itemName] = -amount
+				end
+				if content[itemName] == 0 then content[itemName] = nil end
 			end
-			if content[item] == 0 then content[item] = nil end
 		end
 		-- put need/supply into global table
 		for itemName, amount in pairs(content) do
@@ -62,7 +67,7 @@ end
 
 function distribute_items()
 	game.print("need: " .. serpent.block(global.need))
-	game.print("supply: " .. serpent.block(global.supply))
+	--game.print("supply: " .. serpent.block(global.supply))
 end
 
 

@@ -209,13 +209,18 @@ function chunk_generator_warehouses(event)
 		warehouse.destructible = false
 		warehouse.minable = false
 		
-		local combinator = event.surface.create_entity{
+		local combinatorData = {
 			name = "import-combinator",
 			position = { coords[i][1] + combinatorOffset[1], coords[i][2] + combinatorOffset[2] },
 			force = forceName
 		}
+		local combinator = event.surface.create_entity(combinatorData)
+		local combinator2 = event.surface.create_entity(combinatorData)
 		combinator.destructible = false
 		combinator.minable = false
+		combinator2.destructible = false
+		combinator2.minable = false
+		combinator.connect_neighbour({target_entity=combinator2,wire=defines.wire_type.red})
 		table.insert(global.buildings[forceName],{
 			warehouse = warehouse,
 			combinator = combinator
