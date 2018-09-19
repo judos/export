@@ -5,7 +5,7 @@ local export = {}
 
 -- a bit of work is done every tick, 
 -- the tick amount to repeat the whole export process must be greater than the individual steps done
-local export_repeat_every_x_ticks = 20
+local export_repeat_every_x_ticks = 480
 
 
 
@@ -147,25 +147,24 @@ end
 
 function add_warehouse_items_constant(t, itemName, itemsToMove)
 	local itemsPerWarehouse = math.ceil(math.abs(itemsToMove) / #t)
-	game.print("per warehouse: "..tostring(itemsPerWarehouse).." toMove: "..tostring(itemsToMove))
+	--game.print("per warehouse: "..tostring(itemsPerWarehouse).." toMove: "..tostring(itemsToMove))
 	local movedTotal = 0
 	local moved
 	for _,data in pairs(t) do
 		local inventory = data.warehouse.get_inventory(defines.inventory.chest)
 		local items = {
 			name = itemName,
-			count = math.min(math.abs(itemsPerWarehouse), math.abs(itemsToMove))
+			count = math.min(math.abs(itemsPerWarehouse), math.floor(math.abs(itemsToMove)))
 		}
-		if itemsToMove > 0 then
+		if itemsToMove >= 1 then
 			moved = inventory.insert(items)
 			itemsToMove = itemsToMove - moved
 			movedTotal = movedTotal + moved
-		elseif itemsToMove < 0 then
+		elseif itemsToMove <= -1 then
 			moved = inventory.remove(items)
 			itemsToMove = itemsToMove + moved
 			movedTotal = movedTotal + moved
-		end
-		if itemsToMove == 0 then
+		else
 			return movedTotal
 		end
 	end
@@ -228,7 +227,7 @@ function export.on_tick(event)
 	elseif t == 5 then
 		distribute_items()
 	elseif t == 6 then
-		testing_randomize()
+		--testing_randomize()
 	end
 
 end

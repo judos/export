@@ -1,2 +1,2 @@
 
-export_multiply_factor = 2
+export_multiply_factor = 1.5
