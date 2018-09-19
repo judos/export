@@ -1,14 +1,18 @@
 TODO 4.0:
 	move lua/various.round to lua/numbers
+  remove lua/string> string.starts
+  MIGRATION
+  	instead of string.starts use string.startsWith
 
 
 
 3.8 export
 	add function argument bindings
 	add lua/indices, lua/numbers
-	moved deepcopy function (various to table)
 	added recipe functions
 	add prototype.icons
+	add lua/table.numericAddTable
+	moved deepcopy function (various to table)
 	MIGRATION:
 		fix imports for deepcopy
 	

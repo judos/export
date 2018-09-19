@@ -46,7 +46,6 @@ script.on_event(defines.events.on_tick, function(event)
 	export.on_tick(event)
 end)
 
-
 script.on_event(defines.events.on_chunk_generated, function(event)
 	split.on_chunk_generated(event)
 end)
@@ -55,11 +54,9 @@ script.on_event(defines.events.on_player_created, function(event)
 	split.on_player_created(event)
 end)
 
-
 script.on_event(defines.events.on_built_entity, function(event)
 	split.on_built_entity(event)
 end)
-
 
 function xx(obj)
 	game.print(serpent.block(obj))

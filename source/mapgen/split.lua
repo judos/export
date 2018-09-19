@@ -223,7 +223,7 @@ function chunk_generator_warehouses(event)
 		combinator.connect_neighbour({target_entity=combinator2,wire=defines.wire_type.red})
 		table.insert(global.buildings[forceName],{
 			warehouse = warehouse,
-			combinator = combinator
+			combinator = combinator2
 		})
 	end
 end

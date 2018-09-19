@@ -1,3 +1,13 @@
+function table.numericAddTable(t,t2, factor, initial)
+	if factor == nil then factor = 1 end
+	if initial == nil then initial = 0 end
+	for k,value in pairs(t2) do
+		if t[k] == nil then t[k] = initial end
+		t[k] = t[k] + factor * value
+		if t[k] == 0 then t[k] = nil end
+	end
+end
+
 
 function table.addTable(t,toAdd)
 	if toAdd then
