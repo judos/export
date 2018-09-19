@@ -5,7 +5,7 @@ local export = {}
 
 -- a bit of work is done every tick, 
 -- the tick amount to repeat the whole export process must be greater than the individual steps done
-local export_repeat_every_x_ticks = 480
+local export_repeat_every_x_ticks = 20
 
 
 
@@ -125,16 +125,17 @@ function distribute_item(itemName)
 	local need = global.need[itemName]
 	local supply = global.supply[itemName]
 	local needFactor = 1
-	if need.total > supply.total then
-		needFactor = supply.total / need.total
+	if need.total > supply.total * export_multiply_factor then
+		needFactor = supply.total * export_multiply_factor / need.total
 	end
 	local inserted = add_warehouse_items_factor(need.each,itemName,needFactor) -- round up
-	local supplyFactor = inserted / supply.total
+	local supplyFactor = inserted / (supply.total * export_multiply_factor)
 	local removed = add_warehouse_items_factor(supply.each,"export_"..itemName,-supplyFactor) -- round up
+	removed = removed * export_multiply_factor
 	if inserted > removed then
-		add_warehouse_items_constant(need.each,itemName, removed - inserted) -- remove excess items
+		removed = removed + add_warehouse_items_constant(need.each,itemName, removed - inserted) -- remove excess items
 	elseif removed > inserted then
-		add_warehouse_items_constant(supply.each,itemName, removed - inserted) -- readd missing items
+		inserted = inserted + add_warehouse_items_constant(need.each,itemName, removed - inserted) -- add additional items
 	end
 
 	game.print("new global difference: "..tostring(inserted-removed))
@@ -144,9 +145,31 @@ function distribute_item(itemName)
 end
 
 
-function add_warehouse_items_constant(t, itemName, items)
-
-
+function add_warehouse_items_constant(t, itemName, itemsToMove)
+	local itemsPerWarehouse = math.ceil(math.abs(itemsToMove) / #t)
+	game.print("per warehouse: "..tostring(itemsPerWarehouse).." toMove: "..tostring(itemsToMove))
+	local movedTotal = 0
+	local moved
+	for _,data in pairs(t) do
+		local inventory = data.warehouse.get_inventory(defines.inventory.chest)
+		local items = {
+			name = itemName,
+			count = math.min(math.abs(itemsPerWarehouse), math.abs(itemsToMove))
+		}
+		if itemsToMove > 0 then
+			moved = inventory.insert(items)
+			itemsToMove = itemsToMove - moved
+			movedTotal = movedTotal + moved
+		elseif itemsToMove < 0 then
+			moved = inventory.remove(items)
+			itemsToMove = itemsToMove + moved
+			movedTotal = movedTotal + moved
+		end
+		if itemsToMove == 0 then
+			return movedTotal
+		end
+	end
+	return movedTotal
 end
 
 
@@ -169,17 +192,17 @@ end
 
 function testing_randomize()
 	for forceName,buildings in pairs(global.buildings) do
-		--for _,t in pairs(buildings) do
-		testing_randomize_table(buildings[1])
-		--end
+		local case = math.random(0,1)
+		for _,t in pairs(buildings) do
+			testing_randomize_table(t, case)
+		end
 	end
 end
 
-function testing_randomize_table(t)
+function testing_randomize_table(t,case)
 	local w = t.warehouse
 	local inventory = w.get_inventory(defines.inventory.chest)
 	inventory.clear()
-	local case = math.random(0,1)
 	if case == 0 then -- provide
 		local x = math.random(0,100)
 		if x>0 then inventory.insert{name="export_iron-plate",count=x} end

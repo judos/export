@@ -1,2 +1,2 @@
 
-export_multiply_factor = 3
+export_multiply_factor = 2
