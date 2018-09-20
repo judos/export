@@ -5,7 +5,7 @@ local export = {}
 
 -- a bit of work is done every tick, 
 -- the tick amount to repeat the whole export process must be greater than the individual steps done
-local export_repeat_every_x_ticks = 480
+local export_repeat_every_x_ticks = 5 * 60
 
 
 
@@ -158,15 +158,13 @@ function add_warehouse_items_constant(t, itemName, itemsToMove)
 		}
 		if itemsToMove >= 1 then
 			moved = inventory.insert(items)
-			itemsToMove = itemsToMove - moved
-			movedTotal = movedTotal + moved
 		elseif itemsToMove <= -1 then
-			moved = inventory.remove(items)
-			itemsToMove = itemsToMove + moved
-			movedTotal = movedTotal + moved
+			moved = -inventory.remove(items)
 		else
 			return movedTotal
 		end
+		itemsToMove = itemsToMove - moved
+		movedTotal = movedTotal + math.abs(moved)
 	end
 	return movedTotal
 end
