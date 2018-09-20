@@ -294,7 +294,12 @@ function force_from_position(position)
 end
 
 function split.on_built_entity(event)
+	--if settings.global.export_players_can_build_in_other_districts.value then return end
 	local player = game.players[event.player_index]
+
+	local build = settings.get_player_settings(player.name).export_players_can_build_in_other_districts.value
+	if build then return end
+
 	local force = player.force
 	local entity = event.created_entity
 	local forceArea = force_from_position(entity.position)

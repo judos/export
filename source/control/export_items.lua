@@ -125,13 +125,13 @@ function distribute_item(itemName)
 	local need = global.need[itemName]
 	local supply = global.supply[itemName]
 	local needFactor = 1
-	if need.total > supply.total * export_multiply_factor then
-		needFactor = supply.total * export_multiply_factor / need.total
+	if need.total > supply.total * settings.global.export_multiply_factor.value then
+		needFactor = supply.total * settings.global.export_multiply_factor.value / need.total
 	end
 	local inserted = add_warehouse_items_factor(need.each,itemName,needFactor) -- round up
-	local supplyFactor = inserted / (supply.total * export_multiply_factor)
+	local supplyFactor = inserted / (supply.total * settings.global.export_multiply_factor.value)
 	local removed = add_warehouse_items_factor(supply.each,"export_"..itemName,-supplyFactor) -- round up
-	removed = removed * export_multiply_factor
+	removed = removed * settings.global.export_multiply_factor.value
 	if inserted > removed then
 		removed = removed + add_warehouse_items_constant(need.each,itemName, removed - inserted) -- remove excess items
 	elseif removed > inserted then
