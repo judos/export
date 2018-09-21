@@ -1,5 +1,6 @@
 require "libs.lua.string"
 require "libs.lua.table"
+require "libs.logging"
 
 local export = {}
 
@@ -110,8 +111,8 @@ end
 
 
 function distribute_items()
-	--game.print("need: " .. serpent.block(global.need))
-	--game.print("supply: " .. serpent.block(global.supply))
+	info("need: " .. serpent.block(global.need))
+	info("supply: " .. serpent.block(global.supply))
 
 	for itemName,needTable in pairs(global.need) do
 		if global.supply[itemName] ~= nil then
@@ -138,16 +139,18 @@ function distribute_item(itemName)
 		inserted = inserted + add_warehouse_items_constant(need.each,itemName, removed - inserted) -- add additional items
 	end
 
-	game.print("new global difference: "..tostring(inserted-removed))
+	if math.abs(inserted - removed) >= 1 then
+		warn("export WARN: item distribute difference: "..tostring(inserted-removed))
+	end
 	
-	--game.print("inserted "..tostring(inserted)..", removed: "..tostring(removed).." "..itemName)
-	--game.print("need: "..tostring(needFactor)..", supply: "..tostring(supplyFactor))
+	info("inserted "..tostring(inserted)..", removed: "..tostring(removed).." "..itemName)
+	info("need: "..tostring(needFactor)..", supply: "..tostring(supplyFactor))
 end
 
 
 function add_warehouse_items_constant(t, itemName, itemsToMove)
 	local itemsPerWarehouse = math.ceil(math.abs(itemsToMove) / #t)
-	--game.print("per warehouse: "..tostring(itemsPerWarehouse).." toMove: "..tostring(itemsToMove))
+	info("per warehouse: "..tostring(itemsPerWarehouse).." toMove: "..tostring(itemsToMove))
 	local movedTotal = 0
 	local moved
 	for _,data in pairs(t) do
@@ -208,7 +211,6 @@ function testing_randomize_table(t,case)
 		if x>0 then inventory.insert{name="iron-plate",count=x} end
 		local c = t.combinator
 		x = math.random(0,100)
-		--game.print(serpent.block(c.position).." "..tostring(x))
 		c.get_or_create_control_behavior().set_signal(1, {signal = {type = "item", name = "iron-plate"}, count = x})
 	end
 end
