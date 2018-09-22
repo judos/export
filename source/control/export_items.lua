@@ -181,10 +181,16 @@ function add_warehouse_items_factor(t, itemName, factor)
 			name = itemName,
 			count = math.ceil(math.abs(factor) * data.amount)
 		}
-		if factor > 0 then
-			moved = moved + inventory.insert(items)
+		if items.count > 0 then
+			if factor > 0 then
+				moved = moved + inventory.insert(items)
+			else
+				moved = moved + inventory.remove(items)
+			end
 		else
-			moved = moved + inventory.remove(items)
+			warn(itemName.." add to warehouse with "..tostring(factor).." resulted in moving "..tostring(items.count).." items.")
+			warn(global.need)
+			warn(global.supply)
 		end
 	end
 	return moved
