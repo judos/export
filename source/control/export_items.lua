@@ -59,8 +59,8 @@ end
 
 function read_inventories_force(i)
 	local forceName = "player"..i
-	-- if you supply items, can't simultaneously need them (simplifies distribution logic)
-	local providedItems = {}
+	-- if you need items, can't simultaneously supply them (simplifies distribution logic)
+	local needItems = {}
 
 	for _,forceBuildings in pairs(global.buildings[forceName]) do
 		local combinator = forceBuildings.combinator
@@ -78,10 +78,10 @@ function read_inventories_force(i)
 			if string.startsWith(itemName,"export_") and amount > 0 then
 				t = global.supply
 				itemName = string.sub(itemName,8)
-				providedItems[itemName] = true
 			elseif not string.startsWith(itemName,"export_") and amount < 0 then
 				t = global.need
 				amount = amount * -1
+				needItems[itemName] = true
 			end
 			if t ~= nil then
 				init_table_entry(t,itemName)
@@ -95,16 +95,16 @@ function read_inventories_force(i)
 		end
 	end
 
-	-- remove request of items that are provided by your self
-	for itemName,dataTable in pairs(global.need) do
-		if providedItems[itemName] then
+	-- remove supply of items that are need by your self
+	for itemName,dataTable in pairs(global.supply) do
+		if needItems[itemName] then
 			for key,provideTable in pairs(dataTable.each) do
 				if provideTable.force == forceName then
 					dataTable.each[key] = nil
 					dataTable.total = dataTable.total - provideTable.amount
 				end
 			end
-			if dataTable.total == 0 then global.need[itemName] = nil end
+			if dataTable.total == 0 then global.supply[itemName] = nil end
 		end
 	end
 end
